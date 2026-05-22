@@ -121,7 +121,7 @@ for tk, td in zip(tasks_keys, tasks_display):
 sns.set_theme(style="whitegrid")
 
 # 1. Confusion Matrix
-print("\n[1/4] Generating Confusion Matrix...")
+print("\n[1/5] Generating Confusion Matrix...")
 fig, ax = plt.subplots(figsize=(10, 8))
 ax.grid(False)
 ConfusionMatrixDisplay(
@@ -134,7 +134,7 @@ plt.savefig(os.path.join(PLOTS_DIR, '01_Confusion_Matrix.png'), dpi=300)
 plt.close()
 
 # 2. SNR Robustness Curve
-print("[2/4] Generating SNR Robustness Curve...")
+print("[2/5] Generating SNR Robustness Curve...")
 def calc_snr_acc(targets, preds, snrs):
     return {s: accuracy_score(targets['mod'][snrs==s], preds['mod'][snrs==s])*100 for s in np.unique(snrs) if len(snrs==s)>0}
 
@@ -155,7 +155,7 @@ plt.savefig(os.path.join(PLOTS_DIR, '02_SNR_Robustness.png'), dpi=300)
 plt.close()
 
 # 3. Severity Sensitivity (MAE)
-print("[3/4] Generating Severity Sensitivity Chart (MAE)...")
+print("[3/5] Generating Severity Sensitivity Chart (MAE)...")
 sev_levels = ['none', 'low', 'medium', 'high', 'extreme']
 imp_tasks = {'Phase Noise': 'pn', 'IQ Imbalance': 'iqi', 'Amp Distortion': 'amp_dist', 'Jamming': 'jamming'}
 comb_t = {t: np.concatenate([val_targets[v], test_targets[v]]) for t, v in imp_tasks.items()}
@@ -176,8 +176,25 @@ plt.tight_layout()
 plt.savefig(os.path.join(PLOTS_DIR, '03_Severity_Sensitivity_MAE.png'), dpi=300)
 plt.close()
 
-# 4. Generalization Gap
-print("[4/4] Generating Generalization Gap Bar Chart...")
+# 4. Severity Accuracy (%) - NEW PLOT
+print("[4/5] Generating Severity Accuracy Chart (%)...")
+plt.figure(figsize=(10, 6))
+for i, (name, key) in enumerate(imp_tasks.items()):
+    accs = [accuracy_score(comb_t[name][comb_t[name]==s], comb_p[name][comb_t[name]==s])*100 if np.any(comb_t[name]==s) else np.nan for s in range(5)]
+    plt.plot(sev_levels, accs, marker=['o', 's', '^', 'D'][i], linewidth=2.5, markersize=8, label=name)
+
+plt.title('Accuracy by Impairment Severity', fontsize=14, weight='bold')
+plt.xlabel('Severity Level')
+plt.ylabel('Accuracy (%)')
+plt.ylim(0, 105)
+plt.legend()
+plt.grid(True, ls='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig(os.path.join(PLOTS_DIR, '04_Severity_Accuracy.png'), dpi=300)
+plt.close()
+
+# 5. Generalization Gap
+print("[5/5] Generating Generalization Gap Bar Chart...")
 unkn_counts = test_dataset.df['Unknown_Params_Count'].values
 u_vals = sorted(np.unique(unkn_counts))
 gen_acc = [accuracy_score(test_targets['mod'][unkn_counts==c], test_preds['mod'][unkn_counts==c])*100 for c in u_vals]
@@ -194,7 +211,7 @@ plt.ylim(0, 105)
 plt.xticks(u_vals)
 plt.grid(axis='y', ls='--', alpha=0.7)
 plt.tight_layout()
-plt.savefig(os.path.join(PLOTS_DIR, '04_Generalization_Gap.png'), dpi=300)
+plt.savefig(os.path.join(PLOTS_DIR, '05_Generalization_Gap.png'), dpi=300)
 plt.close()
 
 print(f"\n✅ All plots saved successfully to: {os.path.abspath(PLOTS_DIR)}")
