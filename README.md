@@ -101,5 +101,14 @@ Run the following commands in your terminal:
     cd 03_Vision_Language_Model
     torchrun --nproc_per_node=2 train.py
 
+## 👥 Authors
+
+This project was collaboratively developed as a joint research and engineering effort by:
+
+* **Nektarios Psathas** – [GitHub](https://github.com/Nekthecool)
+* **Angelos Sachmpazidis** – [GitHub](https://github.com/Angel-Sach)
+
+*Both engineers contributed equally to the theoretical mathematical modeling, the implementation of the Deep Learning architectures, and the final empirical evaluation.*
+
 ## Acknowledgements
 This research was supported by the Digital Governance Unit of the Aristotle University of Thessaloniki (AUTh). Compute resources were provided by the National Infrastructures for Research and Technology (GRNET) and funded through the EU Recovery and Resilience Facility.
